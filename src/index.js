@@ -1,17 +1,51 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { useEffect, useState, useRef } from "react";
+import ReactDOM from "react-dom";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+import "./styles.css";
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+function SignUpForm({ isVisible, onSignUp}) {
+  const emailInput = useRef();
+  useEffect(() => {
+      if (isVisible) {
+        emailInput.current.focus();
+      }
+    }, [isVisible]
+  );
+  return (
+    <form style={{ display: isVisible ? "block" : "none" }}>
+      <label>
+        Email
+        <input ref={emailInput} />
+      </label>
+      < br />
+      <button onCLick={onSignUp}>Sign Up</button>
+    </form>
+  );
+}
+
+function App() {
+  const [isSingUpFormVisible, setSignUpFormVisibility] = useState(false);
+  const timeoutId = useRef();
+  useEffect(() => {
+    timeoutId.current = setTimeout(() => setSignUpFormVisibility(true), 3000)
+    return () => {
+      clearTimeout(timeoutId.current);
+    }
+  }, [])
+  return (
+    <div className="App">
+      <SignUpForm isVisible={isSingUpFormVisible}
+       onSignUp={(event) => {
+        event.preventDefault();
+        setSignUpFormVisibility(false);
+        clearTimeout(timeoutId)
+      }}/>
+      <button onClick = {() => setSignUpFormVisibility(prev => !prev)}>
+        Show sign up form
+        </button>
+    </div>
+  );
+}
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<App />, rootElement);
